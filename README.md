@@ -39,7 +39,7 @@
 > 🤖👁️🖥️ 一个基于视觉识别，运行时零侵入的微信4.0 RPA 框架，构建个微聊天机器人，快速接入LLM,Dify
 
 <p align="center">
-  <kbd><img src="https://github.com/user-attachments/assets/efe949ed-b3cd-4f38-a120-5d8be1edbab0" alt="项目演示" width="600"/></kbd>
+  <kbd><img src="https://github.com/user-attachments/assets/e94e0a88-ce16-4f3b-bc48-e6ae08e37eef" alt="项目演示" width="600"/></kbd>
 </p>
 
 ## ✨ 特性
