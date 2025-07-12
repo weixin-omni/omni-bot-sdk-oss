@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package example;
+
+message EmojiDescData {
+  repeated  EmojiDescItem descItem = 1;
+}
+
+message EmojiDescItem {
+  string language  = 1;
+  string desc  = 2;
+}

@@ -1,0 +1,49 @@
+syntax = "proto3";
+// 2025年3月微信4.0.3正式版修改了img命名方式才有了这个东西
+message PackedInfoDataImg2 {
+  int32 field1 = 1;
+  int32 field2 = 2;
+  ImageInfo imageInfo = 3;  // 图片
+  VideoInfo videoInfo = 4;  // 视频
+  AudioInfo audioInfo = 5;  // 语音
+  FileInfo fileInfo = 7;    // 文件
+  MergeInfo mergeInfo = 9;  // 合并转发的聊天记录
+}
+
+message ImageInfo {
+  int32 height = 1;
+  int32 width = 2;
+  string filename = 4;
+}
+
+message VideoInfo {
+  int32 height = 4;
+  int32 width = 5;
+  string filename = 8;
+}
+
+message FileInfo {
+  FileSubMessage1 fileInfo = 1;
+  FileSubMessage2 field2 = 2;
+  string field3 = 3;
+}
+
+message FileSubMessage1 {
+  int32 field1 = 1;
+  string filename = 2;
+}
+
+message FileSubMessage2 {
+  string field1 = 1;
+  string field2 = 2;
+  string field3 = 3;
+}
+
+message MergeInfo {
+  string dir = 1;
+}
+
+message AudioInfo {
+  uint32 field1 = 1;
+  string audioTxt = 2; // 语音转文字结果
+}

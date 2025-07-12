@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+message PackedInfoData {
+  int32 field1 = 1;
+  int32 field2 = 2;
+  FileInfo fileInfo = 7;
+  AnotherNestedMessage info = 9;
+}
+
+message FileInfo {
+  SubMessage1 fileInfo = 1;
+  SubMessage2 field2 = 2;
+  string field3 = 3;
+}
+
+message SubMessage1 {
+  int32 field1 = 1;
+  string filename = 2;
+}
+
+message SubMessage2 {
+  string field1 = 1;
+  string field2 = 2;
+  string field3 = 3;
+}
+
+message AnotherNestedMessage {
+  string dir = 1;
+}

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package example;
+
+// 顶级消息定义
+message PackedInfoData {
+  // varint 类型字段，根据数值范围选用 uint32 或 uint64
+  uint32 field1  = 1;
+  uint32 field2  = 2;
+  MessageField5 info = 5;
+}
+
+// 定义 field14 对应的嵌套消息
+// 修改后的嵌套消息，用于 field 14
+message MessageField5 {
+  uint32 field1 = 1;
+  string audioTxt = 2; // 语音转文字结果
+}

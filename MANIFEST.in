@@ -1,0 +1,8 @@
+global-include *.py
+recursive-include src/omni_bot_sdk/yolo/models *.pt
+recursive-include src/omni_bot_sdk *.pyd
+include config.example.yaml
+exclude src/omni_bot_sdk/utils/fuck_zxl.py
+exclude src/omni_bot_sdk/services/core/database_service.py
+exclude src/omni_bot_sdk/utils/fuck_zxl.pyi
+exclude src/omni_bot_sdk/services/core/database_service.pyi

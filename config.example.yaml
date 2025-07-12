@@ -1,0 +1,100 @@
+dbkey:   # 数据库加密密钥，必须设置
+
+# AES加密用的密钥和XOR，格式为字符串, 设置为空，自动查找
+# 示例：aes_xor_key: 1234567890,17
+aes_xor_key: 
+
+# MCP服务配置
+mcp:
+  # 监听主机地址，通常为0.0.0.0表示所有网卡
+  host: 0.0.0.0
+  # 监听端口
+  port: 8000
+
+dingtalk:
+  # 钉钉机器人Webhook地址，当微信异常时，将推送异常消息和登录二维码
+  webhook_url: https://example.com/robot/send?access_token=YOUR_DINGTALK_TOKEN
+
+logging:
+  # 日志文件最多保留数量
+  backup_count: 5
+  # 日志级别，可选：DEBUG/INFO/WARNING/ERROR
+  level: INFO
+  # 单个日志文件最大字节数
+  max_size: 10485760
+  # 日志文件存放路径
+  path: logs
+
+mqtt:
+  # MQTT客户端ID前缀
+  client_id: weixin_omni
+  # MQTT服务器地址
+  host: 127.0.0.1
+  # MQTT密码
+  password: 'YOUR_MQTT_PASSWORD'
+  # MQTT端口
+  port: 1883
+  # MQTT用户名
+  username: weixin
+
+plugins:
+  # 空群屏蔽插件
+  block-empty-room-plugin:
+    enabled: true
+    priority: 2000
+  # 聊天上下文插件
+  chat-context-plugin:
+    enabled: true
+    priority: 1999
+  # OpenAI对话插件
+  openai-bot-plugin:
+    enabled: true
+    priority: 1497
+    openai_api_key: YOUR_OPENAI_API_KEY
+    openai_base_url: http://example.com:7860
+    openai_model: gemini-2.0-flash  # 使用的模型名
+    prompt: 你是一个聊天机器人，请根据用户的问题给出回答。历史对话：{{chat_history}} 当前时间：{{time_now}} 
+      你的昵称：{{self_nickname}} 群昵称：{{room_nickname}} 消息来自于：{{contact_nickname}}
+  # 自发消息插件
+  self-msg-plugin:
+    enabled: true
+    priority: 1998
+
+rpa:
+  # RPA相关参数
+  action_delay: 0.3  # 操作延迟（秒）
+  scroll_delay: 1  # 滚动延迟（秒）
+  max_retries: 3  # 最大重试次数
+  switch_contact_delay: 0.3  # 切换联系人延迟（秒）
+  ocr:
+    merge_threshold: 5.0  # OCR合并阈值
+    min_confidence: 0.5  # 最小置信度
+    remote_url: http://example.com/ocr  # 远程OCR服务地址
+    use_remote: false  # 是否使用远程OCR
+  room_action_offset:
+  - 0
+  - -30
+  search_contact_offset:
+  - 0
+  - 40
+  side_bar_delay: 3
+  timeout: 30
+  window_margin: 20
+  window_show_delay: 1.5
+  short_term_rate: 0.15
+  short_term_capacity: 2
+  long_term_rate: 0.25
+  long_term_capacity: 10
+
+wxgf:
+  # 微信GF解析API地址，暂时未开放，查看roammap更新计划
+  api_url: http://example.com/api/v1/decrypt
+
+s3:
+  # S3存储配置，微信登录二维码将会推送到这里，建议使用CF的R2免费存储，并设置过期时间1天
+  endpoint_url: https://example.com
+  access_key: YOUR_S3_ACCESS_KEY
+  secret_key: YOUR_S3_SECRET_KEY
+  region: apac
+  bucket: weixin-login-qr
+  public_url_prefix: https://example.com/

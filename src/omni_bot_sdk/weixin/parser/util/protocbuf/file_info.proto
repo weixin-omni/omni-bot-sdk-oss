@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package example;
+
+message FileInfoData {
+  string dir3  = 1;
+  uint32 file_size  = 2;
+}

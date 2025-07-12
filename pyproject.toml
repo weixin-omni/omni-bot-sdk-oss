@@ -1,0 +1,75 @@
+# omni-bot-sdk/pyproject.toml
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omni-bot-sdk"
+version = "0.0.1"
+authors = [
+  { name="huchundong", email="gycm520@gmail.com" },
+]
+description = "Core SDK for building Omni-channel RPA bots."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: Microsoft :: Windows",
+]
+dependencies = [
+    "pyautogui==0.9.54",
+    "sqlcipher3-wheels==0.5.4.post0",
+    "ultralytics==8.3.161",
+    "fastmcp==2.10.1",
+    "paho-mqtt==2.1.0",
+    "protobuf==6.31.1",
+    "aiohttp==3.12.13",
+    "aiofiles==24.1.0",
+    "cryptography==45.0.5",
+    "lxml==6.0.0",
+    "minio==7.2.15",
+    "mss==10.0.0",
+    "fuzzywuzzy==0.18.0",
+    "xmltodict==0.14.2",
+    "yara-python==4.5.4",
+    "zstandard==0.23.0",
+    "pymem==1.14.0",
+    "pywin32==310",
+    "rapidocr==3.2.0",
+    "python-Levenshtein==0.27.1",
+    "watchfiles==1.1.0",
+    "onnxruntime==1.22.0",
+    "ruamel.yaml==0.18.14",
+    "pydantic==2.11.7",
+    "py-machineid==0.8.0",
+    "pyjwt==2.10.1",
+    "openai==1.93.0",
+    "boto3==1.39.3",
+]
+[project.urls]
+Homepage = "https://github.com/weixin-omni/omni-bot-sdk-oss"
+Issues = "https://github.com/weixin-omni/omni-bot-sdk-oss/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.deptry]
+per_rule_ignores = { "DEP003" = ["omni_bot_sdk"] }
+
+[tool.setuptools.package-data]
+"omni_bot_sdk.yolo.models" = ["*.pt"]
+# ===================================================================
+# =================== 核心插件入口点配置 ======================
+# ===================================================================
+[project.entry-points."omni_bot.plugins"]
+# "入口点名称" = "python.import.path:ClassName"
+# - "omni_bot.plugins" 是你定义的入口点组，PluginManager会搜索这个组。
+# - "入口点名称" 是插件的唯一标识符。这个名字会用于配置文件的启用/禁用。
+# - "omni_bot_sdk.plugins.core.self_msg_plugin:SelfMsgPlugin" 是插件类的完整导入路径。
+
+self-msg-plugin = "omni_bot_sdk.plugins.core.self_msg_plugin:SelfMsgPlugin"
+block-empty-room-plugin = "omni_bot_sdk.plugins.core.block_empty_room_plugin:BlockEmptyRoomPlugin"
+

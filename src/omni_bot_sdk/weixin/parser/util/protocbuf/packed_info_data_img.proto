@@ -1,0 +1,7 @@
+syntax = "proto3";
+// 2025年3月微信测试版修改了img命名方式才有了这个东西
+message PackedInfoDataImg {
+  int32 field1 = 1;
+  int32 field2 = 2;
+  string filename = 3;
+}

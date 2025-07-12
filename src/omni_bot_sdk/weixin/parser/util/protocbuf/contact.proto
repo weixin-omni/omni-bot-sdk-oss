@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package example;
+
+// 顶级消息定义
+message ContactInfo {
+  // varint 类型字段，根据数值范围选用 uint32 或 uint64
+  uint32 gender  = 2;  // 性别:1 男 2:女 0:未知
+  uint32 field3  = 3;
+  string signature  = 4;  // 自助者天助！！！
+  string country  = 5;  // CN
+  string province  = 6;  // Shaanxi
+  string city  = 7;  // Xi'an
+  uint32 field8  = 8;
+  string field9  = 9;
+  uint32 field10 = 10; // 4294967295
+  uint32 field11 = 11;
+  uint32 field12 = 12;
+
+  // 修改后的嵌套消息，对应 JSON 中 field 14 的数据结构
+  MessageField14 phone_info = 14;
+
+  string field15 = 15;
+  uint32 field16 = 16;
+  uint32 field17 = 17;
+  uint32 field18 = 18;
+  uint32 field19 = 19;
+  string field20 = 20;
+  string field21 = 21;
+  uint32 field22 = 22;
+  uint32 field23 = 23;
+  uint32 field24 = 24;
+  string field25 = 25;
+  string field26 = 26;
+
+  // 嵌套消息，朋友圈背景
+  MessageField27 moments_info = 27;
+
+  string field28 = 28;
+  string field29 = 29;
+  string label_list = 30;
+  string field31 = 31;
+  string field32 = 32;
+
+  // 嵌套消息，对应 JSON 中 field 33 的 length_delimited 数据
+  MessageField33 field33 = 33;
+
+  string field34 = 34;
+  string field35 = 35;
+  MessageField36 field36 = 36;
+  uint32 field37 = 37;
+  uint32 field38 = 38; // 4294967295
+}
+
+// 定义 field14 对应的嵌套消息
+// 修改后的嵌套消息，用于 field 14
+message MessageField14 {
+  uint32 field1 = 1; // varint 类型字段，存储数字
+  repeated MessageField14_Result2 field2 = 2; // 这是一个 length_delimited 类型的字段，包含多个结果
+}
+
+
+message MessageField14_Result2 {
+  string phone_numer = 1;  // string 类型字段，存储电话号码
+}
+
+// 定义 field27 对应的嵌套消息
+
+message MessageField27 {
+  uint32 field1 = 1;
+  string background_url = 2; // 图片 URL
+  uint64 field3 = 3; // 14588734692813845087（大数，用 uint64）
+  uint32 field4 = 4; // 6785
+  uint32 field5 = 5; // 4320
+}
+
+// 定义 field33 对应的嵌套消息
+
+message MessageField33 {
+  string field1 = 1;
+}
+
+message MessageField36 {
+  MessageField36_Result results = 1;
+}
+
+message MessageField36_Result {
+  string field1 = 1;
+}
