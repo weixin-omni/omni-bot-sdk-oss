@@ -190,7 +190,7 @@ pip install -e .
 可以加Omni-bot的开发者交流群，请注明omni-bot，机器人会自动通过，每天自动通过人数有限，请耐心等待
 
 <p align="center">
-    <img src="https://github.com/user-attachments/assets/8b735832-a8e8-4800-a46b-46a891fa7d8b" alt="交流群" width="300">
+    <img src="https://omni-rpa.bmwidget.com/omni-rpa.jpg" alt="交流群" width="300">
     <img src="https://github.com/user-attachments/assets/16db82a1-6032-4c4b-8287-8dfbb3be70ce" alt="群主bot"width="300">
 </p>
 
