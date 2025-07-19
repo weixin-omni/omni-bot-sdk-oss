@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/weixin-omni/omni-bot-sdk-oss/compare/v0.1.0...v0.1.1) (2025-07-19)
+
+
+### Documentation
+
+* Update README.md ([b940871](https://github.com/weixin-omni/omni-bot-sdk-oss/commit/b940871d2b38843cb91572c249b19390cf862f64))
+
 ## 0.1.0 (2025-07-12)
 
 

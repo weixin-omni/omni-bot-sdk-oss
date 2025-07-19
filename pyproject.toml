@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omni-bot-sdk"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="huchundong", email="gycm520@gmail.com" },
 ]
