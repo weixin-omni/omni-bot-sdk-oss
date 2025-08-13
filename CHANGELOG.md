@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/weixin-omni/omni-bot-sdk-oss/compare/v2.0.0...v2.0.1) (2025-08-13)
+
+
+### Bug Fixes
+
+* 无法找到文件传输助手的问题 ([7c73235](https://github.com/weixin-omni/omni-bot-sdk-oss/commit/7c73235fe5d551a35c396b87a419615847239eec))
+
 ## [2.0.0](https://github.com/weixin-omni/omni-bot-sdk-oss/compare/v1.0.6...v2.0.0) (2025-08-12)
 
 
