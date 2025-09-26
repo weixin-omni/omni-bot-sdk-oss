@@ -66,14 +66,18 @@ class Bot:
         self._status_callbacks = []  # 状态变更回调列表
 
         # 用户服务与用户信息初始化
-        self.user_service: UserService = UserService(self.config.get("dbkey"))
+        self.user_service: UserService = UserService(
+            self.config.get("dbkey"), self.config.get("user")
+        )
         self.user_info: UserInfo = self.user_service.get_user_info()
         allow_versions = ["4.0.6.33"]
         if self.user_info.version not in allow_versions:
             self.logger.error(
                 f"当前微信版本不在支持范围内,目前支持的版本包括：{','.join(allow_versions)}"
             )
-            self.logger.info("您可以前往：https://github.com/cscnk52/wechat-windows-versions/releases 下载历史版本微信")
+            self.logger.info(
+                "您可以前往：https://github.com/cscnk52/wechat-windows-versions/releases 下载历史版本微信"
+            )
             exit(1)
         # 数据库服务初始化（需最先初始化）
         self.db: DatabaseService = DatabaseService(self.user_service)

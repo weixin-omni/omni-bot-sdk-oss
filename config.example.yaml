@@ -1,5 +1,19 @@
 dbkey:   # 数据库加密密钥，必须设置
 
+# 用户和微信相关设置
+user:
+  # 备用用户信息配置 - 当微信版本变化导致内存读取失败时使用
+  # 如果系统无法从微信进程内存中获取用户信息，将使用以下配置作为备用方案
+  # 注意：系统会优先尝试从微信进程内存中读取真实信息，只有失败时才会使用这些备用配置
+  fallback_user_info:
+    account: 微信号          # 备用微信账号，当内存读取失败时使用
+    alias: 昵称             # 备用用户别名/昵称
+    nickname: 机器人         # 备用显示昵称，建议设置为机器人相关名称
+    phone: ""              # 备用手机号，可以为空
+    data_dir: 'C:\path\to\wechat\data'  # 备用微信数据目录路径，请修改为实际路径
+    avatar_url: ""         # 备用头像URL，可以为空
+
+
 # AES加密用的密钥和XOR，格式为字符串, 设置为空，自动查找
 # 示例：aes_xor_key: 1234567890,17
 aes_xor_key: 
@@ -88,6 +102,24 @@ rpa:
   short_term_capacity: 2
   long_term_rate: 0.25
   long_term_capacity: 10
+  # 窗口标题配置 - 用于微信不同语言窗口的标题匹配
+  # 当微信版本更新或者语言更改导致窗口标题变化时，可以通过修改这些配置来适配
+  window_titles:
+    main: 微信  # 微信主窗口标题
+    preview: 预览  # 预览窗口标题
+    add_friend: 通过朋友验证  # 添加好友验证窗口标题
+    invite_member: 微信添加群成员  # 邀请群成员窗口标题
+    remove_member: 微信移出群成员  # 移出群成员窗口标题
+    invite_confirm: Weixin  # 邀请确认弹窗标题
+    invite_reason: Weixin  # 邀请原因弹窗标题
+    search_history: 搜索聊天记录  # 搜索聊天记录窗口标题
+    friend: 朋友圈  # 朋友圈窗口标题
+    menu_window: Weixin  # 菜单弹窗标题
+    room_input_confirm_box: Weixin  # 群聊输入确认弹窗标题
+    search_contact_window: Weixin  # 搜索联系人弹窗标题
+    public_announcement_suffix: 的群公告  # 群公告窗口标题后缀
+    yuanbao: 元宝  # 元宝窗口标题（AI助手窗口）
+
 
 wxgf:
   # 微信GF解析API地址，暂时未开放，查看roammap更新计划

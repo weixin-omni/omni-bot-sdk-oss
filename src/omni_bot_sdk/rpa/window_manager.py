@@ -56,6 +56,28 @@ class WindowTypeEnum(Enum):
     SearchContactWindow = "SearchContactWindow"  # <Win32Window left="61", top="61", width="460", height="128", title="Weixin">
 
 
+class WindowTitleEnum(Enum):
+    """
+    窗口标题配置键名枚举
+    用于从config中获取对应的窗口标题列表
+    """
+
+    MAIN = "main"
+    PREVIEW = "preview"
+    ADD_FRIEND = "add_friend"
+    INVITE_MEMBER = "invite_member"
+    REMOVE_MEMBER = "remove_member"
+    INVITE_CONFIRM = "invite_confirm"
+    INVITE_REASON = "invite_reason"
+    SEARCH_HISTORY = "search_history"
+    FRIEND = "friend"
+    MENU_WINDOW = "menu_window"
+    ROOM_INPUT_CONFIRM_BOX = "room_input_confirm_box"
+    SEARCH_CONTACT_WINDOW = "search_contact_window"
+    PUBLIC_ANNOUNCEMENT_SUFFIX = "public_announcement_suffix"
+    YUANBAO = "yuanbao"  # 元宝窗口
+
+
 class WindowManager:
     """窗口管理器，处理所有窗口相关的操作"""
 
@@ -110,6 +132,39 @@ class WindowManager:
         )
         self.color_ranges = self.rpa_config.get("color_ranges", {})
 
+        # 获取可配置的窗口标题
+        self.window_titles = self.rpa_config.get("window_titles", {})
+
+    def get_window_title(self, title_key: WindowTitleEnum) -> str:
+        """根据enum键获取窗口标题，如果不存在则返回默认值"""
+        defaults = {
+            WindowTitleEnum.MAIN: "微信",
+            WindowTitleEnum.PREVIEW: "预览",
+            WindowTitleEnum.ADD_FRIEND: "通过朋友验证",
+            WindowTitleEnum.INVITE_MEMBER: "微信添加群成员",
+            WindowTitleEnum.REMOVE_MEMBER: "微信移出群成员",
+            WindowTitleEnum.INVITE_CONFIRM: "Weixin",
+            WindowTitleEnum.INVITE_REASON: "Weixin",
+            WindowTitleEnum.SEARCH_HISTORY: "搜索聊天记录",
+            WindowTitleEnum.FRIEND: "朋友圈",
+            WindowTitleEnum.MENU_WINDOW: "Weixin",
+            WindowTitleEnum.ROOM_INPUT_CONFIRM_BOX: "Weixin",
+            WindowTitleEnum.SEARCH_CONTACT_WINDOW: "Weixin",
+            WindowTitleEnum.PUBLIC_ANNOUNCEMENT_SUFFIX: "的群公告",
+            WindowTitleEnum.YUANBAO: "元宝",
+        }
+        return self.window_titles.get(title_key.value, defaults.get(title_key, ""))
+
+    def _title_matches(self, window_title: str, title_key: WindowTitleEnum) -> bool:
+        """检查窗口标题是否匹配配置的标题"""
+        expected_title = self.get_window_title(title_key)
+        return window_title == expected_title
+
+    def _title_endswith(self, window_title: str, title_key: WindowTitleEnum) -> bool:
+        """检查窗口标题是否以指定后缀结尾"""
+        suffix = self.get_window_title(title_key)
+        return window_title.endswith(suffix)
+
     def activate_input_box(self, offset_x: int = 0) -> bool:
         """
         激活输入框
@@ -154,19 +209,27 @@ class WindowManager:
                 time.sleep(self.scroll_delay)
                 init_result = self._init_window_part_size()
                 if init_result:
-                    self.weixin_windows["微信"] = {
-                        "window": pyautogui.getWindowsWithTitle("微信")[0],
-                        "MSG_TOP_X": self.MSG_TOP_X,
-                        "MSG_TOP_Y": self.MSG_TOP_Y,
-                        "MSG_WIDTH": self.MSG_WIDTH,
-                        "MSG_HEIGHT": self.MSG_HEIGHT,
-                        "region": [
-                            0,
-                            0,
-                            self.size_config.width,
-                            self.size_config.height,
-                        ],
-                    }
+                    # 尝试找到主窗口
+                    main_window = None
+                    main_title = self.get_window_title(WindowTitleEnum.MAIN)
+                    windows = pyautogui.getWindowsWithTitle(main_title)
+                    if windows:
+                        main_window = windows[0]
+
+                    if main_window:
+                        self.weixin_windows[main_title] = {
+                            "window": main_window,
+                            "MSG_TOP_X": self.MSG_TOP_X,
+                            "MSG_TOP_Y": self.MSG_TOP_Y,
+                            "MSG_WIDTH": self.MSG_WIDTH,
+                            "MSG_HEIGHT": self.MSG_HEIGHT,
+                            "region": [
+                                0,
+                                0,
+                                self.size_config.width,
+                                self.size_config.height,
+                            ],
+                        }
                     return True
                 return False
             else:
@@ -452,8 +515,9 @@ class WindowManager:
     def init_split_sessions(self):
         """初始化分割的会话"""
         windows = pyautogui.getAllWindows()
+        yuanbao_title = self.get_window_title(WindowTitleEnum.YUANBAO)
         for window in windows:
-            if "元宝" in window.title:
+            if yuanbao_title in window.title:
                 self.logger.info("元宝窗口独立设置")
                 self.weixin_windows[window.title] = {
                     "window": window,
@@ -577,11 +641,18 @@ class WindowManager:
         # TODO 重构
         windows = pyautogui.getAllWindows()
         for window in windows:
-            if window.title == "预览":
+            if self._title_matches(window.title, WindowTitleEnum.PREVIEW):
                 window.close()
-        chat_window = pyautogui.getWindowsWithTitle("微信")[0]
+
+        # 尝试找到主窗口
+        chat_window = None
+        main_title = self.get_window_title(WindowTitleEnum.MAIN)
+        windows_with_title = pyautogui.getWindowsWithTitle(main_title)
+        if windows_with_title:
+            chat_window = windows_with_title[0]
+
         if chat_window:
-            self._activate_window("微信")
+            self._activate_window(chat_window.title)
             if reposition:
                 chat_window.topleft = (0, 0)
             # 这里出现的问题，可能就是宽度有最小值，有可能会比最小值大
@@ -601,8 +672,10 @@ class WindowManager:
             self.logger.error("微信窗口未找到，请检查微信是否正常运行")
             return False
 
-    def _activate_window(self, title: str = "微信"):
+    def _activate_window(self, title: str = None):
         """激活微信窗口"""
+        if title is None:
+            title = self.get_window_title(WindowTitleEnum.MAIN)
         try:
             window = pyautogui.getWindowsWithTitle(title)[0]
             window.activate()
@@ -647,7 +720,8 @@ class WindowManager:
         else:
             # 添加逻辑，如果当前激活的窗口已经是了，就不必再重复激活，直接返回True即可。每次切换，记录最后切换的会话窗口
             # 这个激活窗口感觉有问题
-            self.switch_window("微信")
+            main_title = self.get_window_title(WindowTitleEnum.MAIN)
+            self.switch_window(main_title)
             if self.last_switch_session == target:
                 self.logger.info(f"已经切换到: {target}，直接返回True")
                 return True
@@ -748,7 +822,8 @@ class WindowManager:
         if target in self.weixin_windows:
             self.current_window = self.weixin_windows[target]
         else:
-            self.current_window = self.weixin_windows["微信"]
+            main_title = self.get_window_title(WindowTitleEnum.MAIN)
+            self.current_window = self.weixin_windows[main_title]
         try:
             self.current_window["window"].activate()
             return True
@@ -814,34 +889,34 @@ class WindowManager:
                         # self.logger.info(f"窗口类名: {class_name}{window.title}")
         if windowType == WindowTypeEnum.MainWindow:
             for window in filter_windows:
-                if window.title == "微信":
+                if self._title_matches(window.title, WindowTitleEnum.MAIN):
                     return window
         elif windowType == WindowTypeEnum.AddFriendWindow:
             # 添加好友的窗口，判断规则：标题是 通过朋友验证，同时窗口的位置，应该在主窗口的内部
             for window in filter_windows:
-                if window.title == "通过朋友验证":
+                if self._title_matches(window.title, WindowTitleEnum.ADD_FRIEND):
                     # 这个位置关系不能确定，是浮动的，可以在屏幕的任意位置，但是肯定是可见的，而且明显不会很小
                     # 也有可能是一个很小的微信窗口，title： 微信，真的是吵了小龙的吗了
                     return window
             for window in filter_windows:
-                if window.title == "微信":
-                    # <Win32Window left="22", top="17", width="450", height="356", title="微信">
+                if self._title_matches(window.title, WindowTitleEnum.MAIN):
+                    # <Win32Window left="22", top="17", width="450", height="356", title="WeChat">
                     # 第一轮没有找到，第二轮直接用微信标签找，但是一定要判大小，否则返回主窗口就尴尬了
                     if window.width < 600 and window.height < 500:
                         return window
         elif windowType == WindowTypeEnum.InviteMemberWindow:
             for window in filter_windows:
-                if window.title == "微信添加群成员":
+                if self._title_matches(window.title, WindowTitleEnum.INVITE_MEMBER):
                     # 这个位置关系不能确定，是浮动的，可以在屏幕的任意位置，但是肯定是可见的，而且明显不会很小
                     return window
         elif windowType == WindowTypeEnum.RemoveMemberWindow:
             for window in filter_windows:
-                if window.title == "微信移出群成员":
+                if self._title_matches(window.title, WindowTitleEnum.REMOVE_MEMBER):
                     # 这个位置关系不能确定，是浮动的，可以在屏幕的任意位置，但是肯定是可见的，而且明显不会很小
                     return window
         elif windowType == WindowTypeEnum.InviteConfirmWindow:
             for window in filter_windows:
-                if window.title == "Weixin":
+                if self._title_matches(window.title, WindowTitleEnum.INVITE_CONFIRM):
                     if (
                         window.left + window.width < self.size_config.width
                         and window.top + window.height < self.size_config.height
@@ -849,7 +924,7 @@ class WindowManager:
                         return window
         elif windowType == WindowTypeEnum.InviteResonWindow:
             for window in filter_windows:
-                if window.title == "Weixin":
+                if self._title_matches(window.title, WindowTitleEnum.INVITE_REASON):
                     if (
                         window.left + window.width < self.size_config.width
                         and window.top + window.height < self.size_config.height
@@ -857,19 +932,23 @@ class WindowManager:
                         return window
         elif windowType == WindowTypeEnum.SearchHistoryWindow:
             for window in filter_windows:
-                if window.title == "搜索聊天记录":
+                if self._title_matches(window.title, WindowTitleEnum.SEARCH_HISTORY):
                     return window
         elif windowType == WindowTypeEnum.FriendWindow:
             for window in filter_windows:
-                if window.title == "朋友圈":
+                if self._title_matches(window.title, WindowTitleEnum.FRIEND):
                     return window
         elif windowType == WindowTypeEnum.PublicAnnouncementWindow:
             for window in filter_windows:
-                if window.title.endswith("的群公告"):
+                if self._title_endswith(
+                    window.title, WindowTitleEnum.PUBLIC_ANNOUNCEMENT_SUFFIX
+                ):
                     return window
         elif windowType == WindowTypeEnum.RoomInputConfirmBox:
             for window in filter_windows:
-                if window.title == "Weixin":
+                if self._title_matches(
+                    window.title, WindowTitleEnum.ROOM_INPUT_CONFIRM_BOX
+                ):
                     if (
                         window.left + window.width < self.size_config.width
                         and window.top + window.height < self.size_config.height
@@ -877,12 +956,14 @@ class WindowManager:
                         return window
         elif windowType == WindowTypeEnum.MenuWindow:
             for window in filter_windows:
-                if window.title == "Weixin":
+                if self._title_matches(window.title, WindowTitleEnum.MENU_WINDOW):
                     if window.width < 300:
                         return window
         elif windowType == WindowTypeEnum.SearchContactWindow:
             for window in filter_windows:
-                if window.title == "Weixin":
+                if self._title_matches(
+                    window.title, WindowTitleEnum.SEARCH_CONTACT_WINDOW
+                ):
                     # 这里固定在左上角，所以要判断以下开始位置在左上角
                     if (
                         window.left < self.SIDE_BAR_WIDTH
@@ -967,6 +1048,7 @@ class WindowManager:
         关闭所有窗口
         """
         windows = pyautogui.getAllWindows()
+        main_title = self.get_window_title(WindowTitleEnum.MAIN)
         # 这里保留全部符合的窗口
         for window in windows:
             # 对所有的窗口进行过滤，排除掉不可见的，尺寸为0的
@@ -974,7 +1056,7 @@ class WindowManager:
                 # 这一步要过滤一下非微信的窗口
                 class_name = win32gui.GetClassName(window._hWnd)
                 if class_name.startswith("Qt5"):
-                    if window.title != "微信":
+                    if window.title != main_title:
                         window.close()
 
     def open_close_sidebar(self, close: bool = False) -> bool:

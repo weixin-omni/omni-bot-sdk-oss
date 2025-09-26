@@ -6,7 +6,8 @@
 import json
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any, Dict
+import psutil
 
 from omni_bot_sdk.models import UserInfo
 from omni_bot_sdk.utils.fuck_zxl import WeChatDumper
@@ -18,17 +19,63 @@ class UserService:
     管理用户信息和授权信息。
     """
 
-    def __init__(self, dbkey: str):
+    def __init__(self, dbkey: str, user_config: Optional[Dict[str, Any]] = None):
         """
         初始化用户服务。
 
         Args:
             dbkey: 数据库键。
+            user_config: 用户配置字典，包含用户相关配置项。
         """
         self.dbkey = dbkey
         self.user_info: UserInfo = None
+
+        # Use provided user config or empty dict as fallback
+        user_cfg = user_config or {}
+        fallback_user_info = user_cfg.get("fallback_user_info", {}) or {}
+
         self.wxdump = WeChatDumper()
-        wechat_info = self.wxdump.find_and_dump()
+        wechat_info = None
+
+        # Try to get pid first
+        try:
+            pid = self.wxdump._find_main_wechat_pid()
+            if pid and pid > 0:
+                # Get version info
+                try:
+                    exe = psutil.Process(pid).exe()
+                    version = self.wxdump._get_file_version(exe)
+                except Exception:
+                    version = ""
+
+                # Try full memory dump
+                wechat_info = self.wxdump.find_and_dump()
+                if wechat_info:
+                    # Ensure pid and version are set correctly
+                    wechat_info.pid = pid
+                    if not getattr(wechat_info, "version", None):
+                        wechat_info.version = version
+                elif fallback_user_info:
+                    # Memory dump failed but we have fallback config, use it with real pid
+                    self.user_info = UserInfo(
+                        pid=str(pid),
+                        version=version or str(fallback_user_info.get("version", "")),
+                        account=str(fallback_user_info.get("account", "")),
+                        alias=str(fallback_user_info.get("alias", "")),
+                        nickname=str(fallback_user_info.get("nickname", "")),
+                        phone=str(fallback_user_info.get("phone", "")),
+                        data_dir=str(fallback_user_info.get("data_dir", "")),
+                        dbkey=self.dbkey,
+                        raw_keys={},
+                        dat_key="",
+                        dat_xor_key=-1,
+                        avatar_url=str(fallback_user_info.get("avatar_url", "")),
+                    )
+                    return
+        except Exception:
+            pass
+
+        # If we got wechat_info from memory dump, use it
         if wechat_info:
             self.user_info = UserInfo(
                 pid=wechat_info.pid,
